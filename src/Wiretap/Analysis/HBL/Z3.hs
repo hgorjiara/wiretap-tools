@@ -30,7 +30,6 @@ import           Wiretap.Data.History
 
 import Debug.Trace
 
-
 newtype Z3T s e m a = Z3T
   { _unZ3 :: ReaderT (Z3EnvC, Z3HBLSolver s e) m a
   } deriving ( Applicative, Monad, MonadIO
@@ -43,6 +42,8 @@ instance MonadIO m => HBLSolver s e (Z3T s e m) where
     liftIO $ do
       ast <- toZ3 ctx (z3sToAST solver env) hbl
       Base.solverAssertCnstr ctx slv ast
+      out <- Base.astToString ctx ast
+      traceM $ "\nASSERTSTART\n" ++ out ++ "\nASSERTEND\n"
 
   sat hbl = do
     (env@(Z3EnvC slv ctx), solver) <- ask
@@ -51,6 +52,8 @@ instance MonadIO m => HBLSolver s e (Z3T s e m) where
       Base.solverPush ctx slv
       Base.solverAssertCnstr ctx slv ast
       result <- Base.solverCheck ctx slv
+      out <- Base.astToString ctx ast
+      traceM $ "\nSATSTART\n" ++ out ++ "\nSATEND\n"
       -- (result, model) <- Base.solverCheckAndGetModel ctx slv
       -- case model of
       --   Just m -> do
