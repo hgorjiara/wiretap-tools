@@ -51,9 +51,9 @@ instance MonadIO m => HBLSolver s e (Z3T s e m) where
       ast <- toZ3 ctx (z3sToAST solver env) hbl
       Base.solverPush ctx slv
       Base.solverAssertCnstr ctx slv ast
-      result <- Base.solverCheck ctx slv
       out <- Base.astToString ctx ast
       traceM $ "\nSATSTART\n" ++ out ++ "\nSATEND\n"
+      result <- Base.solverCheck ctx slv
       -- (result, model) <- Base.solverCheckAndGetModel ctx slv
       -- case model of
       --   Just m -> do
